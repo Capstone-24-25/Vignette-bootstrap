@@ -1,10 +1,28 @@
 # Vignette-bootstrap
-Vignette on Bootstrap for Group 7; created as a class project for PSTAT197A in Fall 2024.
 
 Contributors: Jiaxin Su, Sumeng Xu, Ziqian Zhao
 
-Vignette abstract:
+## Vignette abstract:
 
-Repository contents: 
+This is the template repository for Vignette project for Group 7 focusing on **bootstrapping**. We are going to introduce the resampling method -- bootstrapping-- in the following aspects:
 
-Reference list:
+  - the bootstrap sampling distribution,
+  
+  - bootstrap standard errors and confidence intervals,
+  
+  - how the bootstrap usually, but not always, works well.
+  
+Further, we will develop a model with bootstrap step by step to build better intuition on this method. Our data is from: *url* and we aim to *Goal*
+
+
+## Repository contents: 
+
+-   `data` contains
+
+-   `scripts` contains
+
+-   `results` contains
+
+## Step-by step instruction
+
+## Reference list:
