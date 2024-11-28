@@ -1,0 +1,208 @@
+---
+title: "Decision Tree"
+author: "Final Project"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+  pdf_document:
+    toc: true
+    latex_engine: xelatex
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE,
+	tinytex.verbose = TRUE
+)
+```
+
+# Load library and dataset
+```{r}
+library(dplyr)
+library(tidymodels)
+library(tidyverse)
+library(recipes)
+library(ggplot2)
+library(mosaic)
+
+load("../data/Obesity_sample.RData")
+```
+
+```{r}
+Obesity_sample %>% head()
+```
+
+# Decision Tree Without Bootstrapping
+
+## Data Visualization
+
+Firstly, we see the distribution of our response variable in original data set:
+
+```{r, fig.cap = "Obesity Status without Bootstrap"}
+without_bootstrap<-ggplot(Obesity_sample, aes(x = NObeyesdad )) +
+  geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(x = "Obesity Status", 
+       y = "Frequency",
+       title = "Obesity Status without Bootstrap")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+without_bootstrap
+```
+
+## Partition training and testing 
+```{r}
+set.seed(1234)
+partitions <- Obesity_sample %>%
+  initial_split(prop = 0.8, strata = NObeyesdad)
+Obesity_train <- training(partitions)
+Obesity_test <- testing(partitions)
+
+
+Obesity_folds <- vfold_cv(Obesity_train , v = 5, strata = NObeyesdad)
+```
+
+## Recipe
+
+```{r}
+# Creating Recipe using all variables
+Obesity_recipe <-recipe(NObeyesdad ~ ., data = Obesity_train)%>% 
+  step_dummy(all_nominal_predictors()) %>%
+  step_center(all_predictors()) %>% 
+  step_scale(all_predictors())
+```
+
+## Creating Decision Tree Model
+
+```{r}
+# Tuning cost_complexity
+Obesity_tree <- decision_tree(cost_complexity = tune()) %>%
+  set_engine("rpart") %>% 
+  set_mode("classification")
+
+# Creating Decision Tree Workflow
+Obesity_workflow <- workflow() %>% 
+  add_model(Obesity_tree) %>% 
+  add_recipe(Obesity_recipe)
+
+param_grid <- grid_regular(cost_complexity(range = c(-3, -1)), levels = 10)
+```
+
+
+```{r, eval=FALSE}
+# Tune the model
+Obesity_tune_tree <- tune_grid(
+  Obesity_workflow,
+  resamples = Obesity_folds,
+  grid = param_grid,
+  metrics = metric_set(roc_auc)
+)
+
+save(Obesity_tune_tree, file = "results/Obesity_tune_tree.RData")
+```
+
+## Visualize Result
+```{r}
+load("../results/Obesity_tune_tree.RData")
+
+autoplot(Obesity_tune_tree)
+```
+
+
+```{r}
+metrics<- collect_metrics(Obesity_tune_tree)
+best_model <- metrics %>%
+  filter(.metric == "roc_auc")
+
+show_best(Obesity_tune_tree, metric = "roc_auc", n=1)
+
+```
+
+# Decision Tree with bootstrapping
+
+## Bootstrapping
+
+```{r}
+set.seed(1234)
+boot_Obesity <- resample(Obesity_sample,times = 1000)
+```
+
+## Visualize Response Variable
+
+```{r, fig.cap="Obesity Status with Bootstrap"}
+with_bootsrap <- ggplot(boot_Obesity, aes(x = NObeyesdad )) +
+  geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(x = "Obesity Status", 
+       y = "Frequency",
+       title = "Obesity Status with Bootstrap")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+with_bootsrap
+```
+
+## Compare with before bootstrapping
+
+```{r}
+par(mfrow = c(1, 2))
+without_bootstrap
+with_bootsrap
+```
+
+## Parition training and testing with boosted sample
+
+```{r}
+set.seed(1234)
+partitions <- boot_Obesity %>%
+  initial_split(prop = 0.8, strata = NObeyesdad)
+Boot_Obesity_train <- training(partitions)
+Boot_Obesity_test <- testing(partitions)
+
+Obesity_folds_boot <- vfold_cv(Boot_Obesity_train , v = 5, strata = NObeyesdad)
+```
+
+## Same recipe as before with data set replaced
+
+```{r}
+Obesity_recipe_bt <-recipe(NObeyesdad ~ ., data = Boot_Obesity_train)%>% 
+  step_dummy(all_nominal_predictors()) %>%
+  step_center(all_predictors()) %>% 
+  step_scale(all_predictors())
+```
+
+##Creating Decision Tree Workflow for bootstrapping sample
+
+```{r}
+Obesity_workflow_bt <- workflow() %>% 
+  add_model(Obesity_tree) %>% 
+  add_recipe(Obesity_recipe_bt)
+```
+
+## Tune the model
+```{r,eval=FALSE}
+Obesity_tune_tree_bt <- tune_grid(
+  Obesity_workflow_bt,
+  resamples = Obesity_folds_boot,
+  grid = param_grid,
+  metrics = metric_set(roc_auc)
+)
+save(Obesity_tune_tree_bt, file = "../results/Obesity_tune_tree_bt.RData")
+```
+
+## Visualize Result
+
+```{r}
+load(file = "../results/Obesity_tune_tree_bt.RData")
+autoplot(Obesity_tune_tree_bt)
+```
+
+
+```{r}
+metrics<- collect_metrics(Obesity_tune_tree)
+best_model <- metrics %>%
+  filter(.metric == "roc_auc")
+
+show_best(Obesity_tune_tree_bt, metric = "roc_auc", n=1)
+```
+
+# Conclusion
