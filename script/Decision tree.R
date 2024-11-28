@@ -7,16 +7,9 @@ library(mosaic)
 
 load("data/Obesity_sample.RData")
 
-summary(Obesity_sample)
+# summary(Obesity_sample)
 
 # Without Bootstrap
-# See Distribution of response variable
-without_bootstrap<-ggplot(Obesity_sample, aes(x = NObeyesdad )) +
-  geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
-  labs(x = "Obesity Status", 
-       y = "Frequency",
-       title = "Obesity Status without Bootstrap")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Parition training and testing 
 set.seed(1234)
@@ -26,6 +19,14 @@ Obesity_train <- training(partitions)
 Obesity_test <- testing(partitions)
 
 Obesity_folds <- vfold_cv(Obesity_train , v = 5, strata = NObeyesdad)
+
+# See Distribution of response variable
+without_bootstrap<-ggplot(Obesity_train, aes(x = NObeyesdad )) +
+  geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(x = "Obesity Status", 
+       y = "Frequency",
+       title = "Obesity Status without Bootstrap")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Creating Receipe using all varaibles
 Obesity_recipe <-recipe(NObeyesdad ~ ., data = Obesity_train)%>% 
@@ -55,23 +56,18 @@ Obesity_tune_tree <- tune_grid(
   metrics = metric_set(roc_auc)
 )
 
-save(Obesity_tune_tree, file = "results/Obesity_tune_tree.RData")
+# save(Obesity_tune_tree, file = "results/Obesity_tune_tree.RData")
 
 autoplot(Obesity_tune_tree)
 
-metrics<- collect_metrics(Obesity_tune_tree)
-best_model <- metrics %>%
-  filter(.metric == "roc_auc")
-
-show_best(Obesity_tune_tree, metric = "roc_auc", n=1)
-
 # Decision Tree with Bootstrap
 
-boot_Obesity <- resample(Obesity_sample,times = 1000)
+Boot_Obesity_train <- resample(Obesity_train,times = 1000)
+
+Boot_Obesity_train<-Boot_Obesity_train %>% select(-orig.id)
 
 # See Distribution of response variable
-
-with_bootsrap <- ggplot(boot_Obesity, aes(x = NObeyesdad )) +
+with_bootsrap <- ggplot(Boot_Obesity_train, aes(x = NObeyesdad )) +
   geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
   labs(x = "Obesity Status", 
        y = "Frequency",
@@ -82,15 +78,6 @@ par(mfrow = c(1, 2))
 without_bootstrap
 with_bootsrap
 
-
-# Parition training and testing 
-set.seed(1234)
-partitions <- boot_Obesity %>%
-  initial_split(prop = 0.8, strata = NObeyesdad)
-Boot_Obesity_train <- training(partitions)
-Boot_Obesity_test <- testing(partitions)
-
-Obesity_folds_boot <- vfold_cv(Boot_Obesity_train , v = 5, strata = NObeyesdad)
 
 # Creating Receipe using all varaibles
 Obesity_recipe_bt <-recipe(NObeyesdad ~ ., data = Boot_Obesity_train)%>% 
@@ -108,17 +95,14 @@ Obesity_workflow_bt <- workflow() %>%
 # Tune the model
 Obesity_tune_tree_bt <- tune_grid(
   Obesity_workflow_bt,
-  resamples = Obesity_folds_boot,
+  resamples = Obesity_folds,
   grid = param_grid,
   metrics = metric_set(roc_auc)
 )
 
-save(Obesity_tune_tree_bt, file = "results/Obesity_tune_tree_bt.RData")
+# save(Obesity_tune_tree_bt, file = "results/Obesity_tune_tree_bt.RData")
 
 autoplot(Obesity_tune_tree_bt)
 
-metrics<- collect_metrics(Obesity_tune_tree)
-best_model <- metrics %>%
-  filter(.metric == "roc_auc")
-
+show_best(Obesity_tune_tree, metric = "roc_auc", n=1)
 show_best(Obesity_tune_tree_bt, metric = "roc_auc", n=1)
