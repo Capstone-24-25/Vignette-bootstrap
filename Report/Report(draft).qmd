@@ -12,16 +12,66 @@ execute:
   echo: true
   cache: true
 ---
+## Basic Bootstrapping
+
+**Bootstrap resampling/Bootstrapping** is the process, pretending that our sample represents some notional population, and taking repeated samples of size N with replacement from our original sample of size N.
+
+We use bootstrapping when we can’t feasibly take repeated samples from the same random process that generated our data, to see how our estimate changes from one sample to the next. The inability to resample is often due to factors such as the time-consuming nature of the process, the high cost of collecting additional data, and other practical constraints.
+
+# Process
+
+1.  Sampling N individuals from the population.
+
+2.  Obtain a sample of size N from the original dataset with replacement. This new sample is referred as the bootstrapped dataset.
+
+3.  Calculating some types of statistical metrics, like mean
+
+4.  Keeping track of the metrics for each bootstrap sample.
+
+5.  Repeating steps 2 to 4 a bunch of times
+
+    [!!!]{style="color:red;"}Make sure to keep each bootstrap sample must be of the same size (N) as the original sample.
+
+    [!!!]{style="color:red;"} Remember to have each bootstrap sample with replacement from the original sample.
+
+    Here is how bootstrapping looks like in a picture.
+
+![](images/Screen%20Shot%202024-12-02%20at%2011.09.19%20PM.png)
+
+# Example
+
+Imagine you want to estimate the average height of all adults in a city, but you only have a small sample of 100 individuals due to labor and money constraint. Calculating the sample mean gives you an estimate, but you’d also like to understand the variability of this estimate.
+
+Using bootstrapping, you can simulate this process:
+
+1.  From your original sample of 100 individuals, randomly draw 100 data points with replacement. This means some individuals might appear multiple times in the new dataset, while others might not appear at all.
+
+2.  Calculate the mean height for this resampled dataset.
+
+3.  Repeat this resampling process many times (e.g., 10,000 iterations), creating a distribution of mean heights.
+
+[!!!]{style="color:red;"} This distribution of sample means (called the bootstrap distribution) allows you to estimate the standard error of the mean, construct confidence intervals, or test hypotheses about the population mean—all without requiring additional data collection.
+
+# Assumption
+
+1.  Bootstrapping assumes randomness in your data, and therefore the statistical uncertainty in your answer, arises from the process of sampling.
+
+2.  Bootstrapping is also a good approximation for *other* common forms of randomness, including experimental randomization, measurement error, and intrinsic variability of some natural process.
+
+In the following section we will demonstrate how to implement bootstrapping in R.
+
+
 
 # Application
 
 After we have an idea about what bootstrap is, let's go over a simple example to see its application in a classification prediction task and its impact.
 
-The dataset is from Kaggle  *https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels*, which is first introduced in the paper  *Yağın, Fatma Hilal et al. “Estimation of Obesity Levels with a Trained Neural Network Approach optimized by the Bayesian Technique.” Applied Sciences (2023): n. pag.*  to estimate obesity levels with neural network. The original data contains 17 attributes and 2111 observations. For our purpose in performing bootstrapping, we are going to randomly sample a smaller subset of the data set (700 observations) and perform a **decision tree** to do classification. 
+The dataset is from Kaggle *https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels*, which is first introduced in the paper *Yağın, Fatma Hilal et al. “Estimation of Obesity Levels with a Trained Neural Network Approach optimized by the Bayesian Technique.” Applied Sciences (2023): n. pag.* to estimate obesity levels with neural network. The original data contains 17 attributes and 2111 observations. For our purpose in performing bootstrapping, we are going to randomly sample a smaller subset of the data set (700 observations) and perform a **decision tree** to do classification.
 
 In this example, we aim to do two decision trees with original data set and bootstrapped data set, and investigate the changes in accuracy and the impact on prediction.
 
 # Load library and clean dataset
+
 ```{r, echo= FALSE}
 library(dplyr)
 library(tidymodels)
@@ -37,7 +87,8 @@ library(kableExtra)
 load("../data/Obesity_sample.RData")
 ```
 
-Firstly, let's look at the dataset 
+Firstly, let's look at the dataset
+
 ```{r,echo= FALSE}
 head(Obesity_sample, 5) %>%
   kbl() %>%
@@ -48,9 +99,9 @@ head(Obesity_sample, 5) %>%
 
 # Decision Tree Without Bootstrapping
 
-## Partition training and testing 
+## Partition training and testing
 
-We parition the data into 80% training and 20% testing stratified by the response `NObeyesdad`.  We’ll also use 5 folds to perform stratifies cross validation.
+We parition the data into 80% training and 20% testing stratified by the response `NObeyesdad`. We’ll also use 5 folds to perform stratifies cross validation.
 
 ```{r}
 set.seed(1234)
@@ -88,6 +139,7 @@ Obesity_recipe <-recipe(NObeyesdad ~ ., data = Obesity_train)
 ## Creating Decision Tree Model
 
 We create a decision tree tuning the hyperparameter `cost_complexity`
+
 ```{r}
 # Tuning cost_complexity
 Obesity_tree <- decision_tree(cost_complexity = tune()) %>%
@@ -102,7 +154,6 @@ Obesity_workflow <- workflow() %>%
 param_grid <- grid_regular(cost_complexity(range = c(-4.5, -2)), levels = 10)
 ```
 
-
 ```{r,eval=FALSE}
 # Tune the model
 Obesity_tune_tree <- tune_grid(
@@ -116,12 +167,12 @@ save(Obesity_tune_tree, file = "../results/Obesity_tune_tree.RData")
 ```
 
 ## Visualize Result of Original data
+
 ```{r,echo= FALSE}
 load("../results/Obesity_tune_tree.RData")
 
 autoplot(Obesity_tune_tree)
 ```
-
 
 ```{r,echo= FALSE}
 metrics<- collect_metrics(Obesity_tune_tree)
@@ -153,7 +204,7 @@ ggplot(boot_Obesity, aes(x = NObeyesdad )) +
 
 ## Compare with before bootstrapping
 
-Here we visualize the distribution of our response variables from two training set. 
+Here we visualize the distribution of our response variables from two training set.
 
 ```{r, fig.cap = "Comparison of Obesity Status across training set",echo= FALSE}
 # Count 
@@ -178,7 +229,6 @@ ggplot(Obesity_matrix, aes(x = NObeyesdad, y = n, fill = Source)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-
 ## New Recipe and Model
 
 We use the same recipe with data changed to bootstrapped data. Perform the exact same procedure as before to see the impact of bootstrapping.
@@ -187,7 +237,6 @@ We use the same recipe with data changed to bootstrapped data. Perform the exact
 # Recipe
 Obesity_recipe_bt <-recipe(NObeyesdad ~ ., data = boot_Obesity)
 ```
-
 
 ```{r}
 # Wrokflow
@@ -214,7 +263,6 @@ load(file = "../results/Obesity_tune_tree_bt.RData")
 autoplot(Obesity_tune_tree_bt)
 ```
 
-
 ```{r,echo= FALSE}
 metrics_bt<- collect_metrics(Obesity_tune_tree_bt)
 # show_best(Obesity_tune_tree_bt, metric = "roc_auc", n=3)
@@ -228,11 +276,11 @@ metric_comp <- data.frame(
 )
 # metric_comp
 ```
-| Model         | Cost_Complexity | ROC_AUC|
-|---------------|----------------|--------|
-| Without Bootstrap   |    3.162278e-05     | 0.9548125	|
-| With Bootstrap |    3.162278e-05       | 0.9548125	|
 
+| Model             | Cost_Complexity | ROC_AUC   |
+|-------------------|-----------------|-----------|
+| Without Bootstrap | 3.162278e-05    | 0.9548125 |
+| With Bootstrap    | 3.162278e-05    | 0.9548125 |
 
 Here, as we expected the performance, the performance is similar. Actually, in our case, the metric for these two model is exactly the same, which possibly attribute to the very similar training set we have. Additionally, we are using a **decision tree** purely for learning purpose, which, a simple model, might be less sensitive to the change in data set.
 
@@ -296,9 +344,9 @@ confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obe
 
 ```
 
-| Model         | Accuracy |
-|---------------|----------------|
-| Without Bootstrap   |    0.845     |
-| With Bootstrap |    0.859       |
+| Model             | Accuracy |
+|-------------------|----------|
+| Without Bootstrap | 0.845    |
+| With Bootstrap    | 0.859    |
 
 Here, we can see that after bootstrapping, the accuracy does improved a little, which aligns our expectation.

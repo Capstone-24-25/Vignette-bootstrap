@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -24,7 +24,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -69,7 +69,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="Report(draft)_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Report(draft)_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Report(draft)_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-
 <script src="Report(draft)_files/libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="Report(draft)_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
@@ -109,8 +108,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
 
+
+<section id="basic-bootstrapping" class="level2">
+<h2 class="anchored" data-anchor-id="basic-bootstrapping">Basic Bootstrapping</h2>
+<p><strong>Bootstrap resampling/Bootstrapping</strong> is the process, pretending that our sample represents some notional population, and taking repeated samples of size N with replacement from our original sample of size N.</p>
+<p>We use bootstrapping when we can’t feasibly take repeated samples from the same random process that generated our data, to see how our estimate changes from one sample to the next. The inability to resample is often due to factors such as the time-consuming nature of the process, the high cost of collecting additional data, and other practical constraints.</p>
+</section>
+<section id="process" class="level1">
+<h1>Process</h1>
+<ol type="1">
+<li><p>Sampling N individuals from the population.</p></li>
+<li><p>Obtain a sample of size N from the original dataset with replacement. This new sample is referred as the bootstrapped dataset.</p></li>
+<li><p>Calculating some types of statistical metrics, like mean</p></li>
+<li><p>Keeping track of the metrics for each bootstrap sample.</p></li>
+<li><p>Repeating steps 2 to 4 a bunch of times</p>
+<p><span style="color:red;">!!!</span>Make sure to keep each bootstrap sample must be of the same size (N) as the original sample.</p>
+<p><span style="color:red;">!!!</span> Remember to have each bootstrap sample with replacement from the original sample.</p>
+<p>Here is how bootstrapping looks like in a picture.</p></li>
+</ol>
+<p><img src="images/Screen%20Shot%202024-12-02%20at%2011.09.19%20PM.png" class="img-fluid"></p>
+</section>
+<section id="example" class="level1">
+<h1>Example</h1>
+<p>Imagine you want to estimate the average height of all adults in a city, but you only have a small sample of 100 individuals due to labor and money constraint. Calculating the sample mean gives you an estimate, but you’d also like to understand the variability of this estimate.</p>
+<p>Using bootstrapping, you can simulate this process:</p>
+<ol type="1">
+<li><p>From your original sample of 100 individuals, randomly draw 100 data points with replacement. This means some individuals might appear multiple times in the new dataset, while others might not appear at all.</p></li>
+<li><p>Calculate the mean height for this resampled dataset.</p></li>
+<li><p>Repeat this resampling process many times (e.g., 10,000 iterations), creating a distribution of mean heights.</p></li>
+</ol>
+<p><span style="color:red;">!!!</span> This distribution of sample means (called the bootstrap distribution) allows you to estimate the standard error of the mean, construct confidence intervals, or test hypotheses about the population mean—all without requiring additional data collection.</p>
+</section>
+<section id="assumption" class="level1">
+<h1>Assumption</h1>
+<ol type="1">
+<li><p>Bootstrapping assumes randomness in your data, and therefore the statistical uncertainty in your answer, arises from the process of sampling.</p></li>
+<li><p>Bootstrapping is also a good approximation for <em>other</em> common forms of randomness, including experimental randomization, measurement error, and intrinsic variability of some natural process.</p></li>
+</ol>
+<p>In the following section we will demonstrate how to implement bootstrapping in R.</p>
+</section>
 <section id="application" class="level1">
 <h1>Application</h1>
 <p>After we have an idea about what bootstrap is, let’s go over a simple example to see its application in a classification prediction task and its impact.</p>
@@ -120,10 +159,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="load-library-and-clean-dataset" class="level1">
 <h1>Load library and clean dataset</h1>
 <p>Firstly, let’s look at the dataset</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-2_abe5e3a40cfda0c109be3080a23fd35c">
+<div class="cell">
 <div class="cell-output-display">
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; ">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Age</th>
@@ -253,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="partition-training-and-testing" class="level2">
 <h2 class="anchored" data-anchor-id="partition-training-and-testing">Partition training and testing</h2>
 <p>We parition the data into 80% training and 20% testing stratified by the response <code>NObeyesdad</code>. We’ll also use 5 folds to perform stratifies cross validation.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-3_47c3df9c978ab4d4e2d287c0e02a5785">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>partitions <span class="ot">&lt;-</span> Obesity_sample <span class="sc">%&gt;%</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>(<span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> NObeyesdad)</span>
@@ -267,12 +306,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-visualization" class="level2">
 <h2 class="anchored" data-anchor-id="data-visualization">Data Visualization</h2>
 <p>Firstly, we see the distribution of our response variable in training data set:</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-4_233e61512c3d00b15adb853f938af2ac">
+<div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Report-draft-_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Obesity Status without Bootstrap</figcaption>
+<figcaption>Obesity Status without Bootstrap</figcaption>
 </figure>
 </div>
 </div>
@@ -281,7 +320,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="recipe" class="level2">
 <h2 class="anchored" data-anchor-id="recipe">Recipe</h2>
 <p>We are going to use all predictors to predict obesity status <code>NObeyesdad</code>.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-5_3db256b7880b649fe614cb9d0c12e7b3">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Recipe using all variables</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> Obesity_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -289,7 +328,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="creating-decision-tree-model" class="level2">
 <h2 class="anchored" data-anchor-id="creating-decision-tree-model">Creating Decision Tree Model</h2>
 <p>We create a decision tree tuning the hyperparameter <code>cost_complexity</code></p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-6_b6290c3d05da5d86333b3e5f9c603a9b">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tuning cost_complexity</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Obesity_tree <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">%&gt;%</span> </span>
@@ -302,7 +341,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>param_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost_complexity</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">4.5</span>, <span class="sc">-</span><span class="dv">2</span>)), <span class="at">levels =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-7_50332e783ae3f26ca8b2feb4780ca00b">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune the model</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow,</span>
@@ -316,9 +355,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualize-result-of-original-data" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-result-of-original-data">Visualize Result of Original data</h2>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-8_6b51994464e161756c11ef501c710dfc">
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -328,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="bootstrapping" class="level2">
 <h2 class="anchored" data-anchor-id="bootstrapping">Bootstrapping</h2>
 <p>We bootstrap the training set for 1000 times.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-10_af5d3f0d06f22be568571f243b4991e2">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2345</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> <span class="fu">resample</span>(Obesity_train,<span class="at">times =</span> <span class="dv">1000</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> boot_Obesity <span class="sc">%&gt;%</span> </span>
@@ -337,12 +380,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualize-response-variable" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-response-variable">Visualize Response Variable</h2>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-11_725813e7efff138c047b23dd9ed4f384">
+<div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Report-draft-_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Obesity Status with Bootstrap</figcaption>
+<figcaption>Obesity Status with Bootstrap</figcaption>
 </figure>
 </div>
 </div>
@@ -351,12 +394,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="compare-with-before-bootstrapping" class="level2">
 <h2 class="anchored" data-anchor-id="compare-with-before-bootstrapping">Compare with before bootstrapping</h2>
 <p>Here we visualize the distribution of our response variables from two training set.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-12_0bb2d4112088b1b3ce5cb21a6358bb99">
+<div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Report-draft-_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Comparison of Obesity Status across training set</figcaption>
+<figcaption>Comparison of Obesity Status across training set</figcaption>
 </figure>
 </div>
 </div>
@@ -365,17 +408,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="new-recipe-and-model" class="level2">
 <h2 class="anchored" data-anchor-id="new-recipe-and-model">New Recipe and Model</h2>
 <p>We use the same recipe with data changed to bootstrapped data. Perform the exact same procedure as before to see the impact of bootstrapping.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-13_d975cf938220765cc88e2436c2e6829e">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recipe</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe_bt <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> boot_Obesity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-14_3b902933aac18e8e984dbca1302a4539">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrokflow</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Obesity_workflow_bt <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe_bt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-15_4a2037c39e39d1a3a1164bdc162c656d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune model</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree_bt <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow_bt,</span>
@@ -388,12 +431,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualize-result-with-bootstrapped-data" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-result-with-bootstrapped-data">Visualize Result with Bootstrapped data</h2>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-16_90378efceb36757546336d962bc9ca34">
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<table class="table">
+</div>
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -422,7 +469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We then fit our model with the best <strong>cost_complexity</strong> and predict on our test set.</p>
 <section id="prediction-with-two-models" class="level2">
 <h2 class="anchored" data-anchor-id="prediction-with-two-models">Prediction with two models</h2>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-19_2320de8c6bb97f43aefe0a2b833d8729">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>best_complexity <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity)</span>
@@ -433,7 +480,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                               Obesity_test) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NObeyesdad, <span class="fu">starts_with</span>(<span class="st">".pred"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-20_f54fc9ca13fd3d315e7ae1c6277998e1">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>best_complexity_bt <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree_bt)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bt_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity_bt)</span>
@@ -447,13 +494,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualize-the-roc-curve-for-both-prediction-model" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-the-roc-curve-for-both-prediction-model">Visualize the ROC curve for both prediction model</h2>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-21_16e5b237fe79f7f4ea835449d6f70774">
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>From the <strong>roc curve</strong>, we could see that models trained by bootstrapped data hugs the top-left corner more than the model without bootstrapping.</p>
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -512,18 +563,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -555,11 +595,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -569,8 +648,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -582,7 +670,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -626,6 +837,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -651,6 +863,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -711,6 +949,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 
