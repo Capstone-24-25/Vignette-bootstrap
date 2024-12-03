@@ -1,30 +1,28 @@
 ---
-title: "Decision Tree"
-author: "Final Project"
-output:
-  html_document:
-    toc: true
-    toc_float: true
-    code_folding: show
-  pdf_document:
-    toc: true
-    latex_engine: xelatex
+title: "Vignette on bootstrapping and its application in predicting obesity levels; created as a class project for PSTAT197A in Fall 2024. "
+author: "Jiaxin Su, Sumeng Xu, Ziqian Zhao"
+date: last-modified
+published-title:
+editor: visual
+format: html
+code-copy: true
+execute:
+  message: false
+  warning: false
+  echo: true
+  cache: true
 ---
 
-```{r, setup, include=FALSE}
-knitr::opts_chunk$set(
-	echo = TRUE,
-	message = FALSE,
-	warning = FALSE,
-	tinytex.verbose = TRUE,
-	fig.width = 8,
-	fig.height = 6,
-	fig.pos = "center"
-)
-```
+# Application
 
-# Load library and dataset
-```{r}
+After we have an idea about what bootstrap is, let's go over a simple example to see its application in a classification prediction task and its impact.
+
+The dataset is from Kaggle  *https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels*, which is first introduced in the paper  *Yağın, Fatma Hilal et al. “Estimation of Obesity Levels with a Trained Neural Network Approach optimized by the Bayesian Technique.” Applied Sciences (2023): n. pag.*  to estimate obesity levels with neural network. The original data contains 17 attributes and 2111 observations. For our purpose in performing bootstrapping, we are going to randomly sample a smaller subset of the data set (700 observations) and perform a **decision tree** to do classification. 
+
+In this example, we aim to do two decision trees with original data set and bootstrapped data set, and investigate the changes in accuracy and the impact on prediction.
+
+# Load library and clean dataset
+```{r, echo= FALSE}
 library(dplyr)
 library(tidymodels)
 library(tidyverse)
@@ -35,16 +33,25 @@ library(graphics)
 library(rpart)
 library(caret)
 library(gridExtra)
+library(kableExtra)
 load("../data/Obesity_sample.RData")
 ```
 
-```{r}
-Obesity_sample %>% head()
+Firstly, let's look at the dataset 
+```{r,echo= FALSE}
+head(Obesity_sample, 5) %>%
+  kbl() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
+                full_width = FALSE) %>%
+  scroll_box(height = "200px") 
 ```
 
 # Decision Tree Without Bootstrapping
 
 ## Partition training and testing 
+
+We parition the data into 80% training and 20% testing stratified by the response `NObeyesdad`.  We’ll also use 5 folds to perform stratifies cross validation.
+
 ```{r}
 set.seed(1234)
 partitions <- Obesity_sample %>%
@@ -60,7 +67,7 @@ Obesity_folds <- vfold_cv(Obesity_train , v = 5, strata = NObeyesdad)
 
 Firstly, we see the distribution of our response variable in training data set:
 
-```{r, fig.cap = "Obesity Status without Bootstrap"}
+```{r, fig.cap = "Obesity Status without Bootstrap",echo= FALSE}
 ggplot(Obesity_train, aes(x = NObeyesdad )) +
   geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
   labs(x = "Obesity Status", 
@@ -92,7 +99,7 @@ Obesity_workflow <- workflow() %>%
   add_model(Obesity_tree) %>% 
   add_recipe(Obesity_recipe)
 
-param_grid <- grid_regular(cost_complexity(range = c(-3, -1)), levels = 10)
+param_grid <- grid_regular(cost_complexity(range = c(-4.5, -2)), levels = 10)
 ```
 
 
@@ -108,17 +115,17 @@ Obesity_tune_tree <- tune_grid(
 save(Obesity_tune_tree, file = "../results/Obesity_tune_tree.RData")
 ```
 
-## Visualize Result
-```{r}
+## Visualize Result of Original data
+```{r,echo= FALSE}
 load("../results/Obesity_tune_tree.RData")
 
 autoplot(Obesity_tune_tree)
 ```
 
 
-```{r}
+```{r,echo= FALSE}
 metrics<- collect_metrics(Obesity_tune_tree)
-show_best(Obesity_tune_tree, metric = "roc_auc", n=1)
+# show_best(Obesity_tune_tree, metric = "roc_auc", n=3)
 ```
 
 # Decision Tree with bootstrapping
@@ -136,7 +143,7 @@ boot_Obesity <- boot_Obesity %>%
 
 ## Visualize Response Variable
 
-```{r, fig.cap="Obesity Status with Bootstrap"}
+```{r, fig.cap="Obesity Status with Bootstrap",echo= FALSE}
 ggplot(boot_Obesity, aes(x = NObeyesdad )) +
   geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
   labs(x = "Obesity Status", 
@@ -148,7 +155,7 @@ ggplot(boot_Obesity, aes(x = NObeyesdad )) +
 
 Here we visualize the distribution of our response variables from two training set. 
 
-```{r, fig.cap = "Comparison of Obesity Status across training set", }
+```{r, fig.cap = "Comparison of Obesity Status across training set",echo= FALSE}
 # Count 
 freq_obesity <- Obesity_train %>%
   count(NObeyesdad) %>%
@@ -172,22 +179,25 @@ ggplot(Obesity_matrix, aes(x = NObeyesdad, y = n, fill = Source)) +
 ```
 
 
-## Same recipe with data set replaced
+## New Recipe and Model
+
+We use the same recipe with data changed to bootstrapped data. Perform the exact same procedure as before to see the impact of bootstrapping.
 
 ```{r}
+# Recipe
 Obesity_recipe_bt <-recipe(NObeyesdad ~ ., data = boot_Obesity)
 ```
 
-##Creating Decision Tree Workflow for bootstrapping sample
 
 ```{r}
+# Wrokflow
 Obesity_workflow_bt <- workflow() %>% 
   add_model(Obesity_tree) %>% 
   add_recipe(Obesity_recipe_bt)
 ```
 
-## Tune the model
 ```{r,eval=FALSE}
+# Tune model
 Obesity_tune_tree_bt <- tune_grid(
   Obesity_workflow_bt,
   resamples = Obesity_folds,
@@ -197,18 +207,32 @@ Obesity_tune_tree_bt <- tune_grid(
 save(Obesity_tune_tree_bt, file = "../results/Obesity_tune_tree_bt.RData")
 ```
 
-## Visualize Result
+## Visualize Result with Bootstrapped data
 
-```{r}
+```{r,echo= FALSE}
 load(file = "../results/Obesity_tune_tree_bt.RData")
 autoplot(Obesity_tune_tree_bt)
 ```
 
 
-```{r}
+```{r,echo= FALSE}
 metrics_bt<- collect_metrics(Obesity_tune_tree_bt)
-show_best(Obesity_tune_tree_bt, metric = "roc_auc", n=1)
+# show_best(Obesity_tune_tree_bt, metric = "roc_auc", n=3)
 ```
+
+```{r,echo= FALSE}
+metric_comp <- data.frame(
+  Model = c("W/O Bootstrapping", "With Bootstrapping"),
+  Cost_Complexity = c(metrics$cost_complexity[1], metrics_bt$cost_complexity[1]),
+  ROC_AUC = c(metrics$mean[1], metrics_bt$mean[1])
+)
+# metric_comp
+```
+| Model         | Cost_Complexity | ROC_AUC|
+|---------------|----------------|--------|
+| Without Bootstrap   |    3.162278e-05     | 0.9548125	|
+| With Bootstrap |    3.162278e-05       | 0.9548125	|
+
 
 Here, as we expected the performance, the performance is similar. Actually, in our case, the metric for these two model is exactly the same, which possibly attribute to the very similar training set we have. Additionally, we are using a **decision tree** purely for learning purpose, which, a simple model, might be less sensitive to the change in data set.
 
@@ -244,21 +268,24 @@ bt_Obesity_model_test <- augment(bt_Obesity_model,
   select(NObeyesdad, starts_with(".pred"))
 ```
 
+## Visualize the ROC curve for both prediction model
 
-```{r, fig.width=6,fig.height=4}
+```{r,echo= FALSE}
 roc_ori <- roc_curve(Ori_Obesity_model_test, truth = NObeyesdad, .pred_Insufficient_Weight:.pred_Overweight_Level_II)
 roc_bt <- roc_curve(bt_Obesity_model_test, truth = NObeyesdad, .pred_Insufficient_Weight:.pred_Overweight_Level_II) 
 
 grid.arrange(
   autoplot(roc_ori), 
   autoplot(roc_bt), 
-  ncol = 2
+  ncol = 2,
+  top = "Visualization of ROC",
+  bottom = "W/O Bootstrap(left), Boostrapped (Right)"
 )
 ```
 
 From the **roc curve**, we could see that models trained by bootstrapped data hugs the top-left corner more than the model without bootstrapping.
 
-```{r}
+```{r,echo= FALSE}
 confusion_matrix <- confusionMatrix(Ori_Obesity_model_test$.pred_class, Ori_Obesity_model_test$NObeyesdad)
 
 confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obesity_model_test$NObeyesdad)
@@ -275,6 +302,3 @@ confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obe
 | With Bootstrap |    0.859       |
 
 Here, we can see that after bootstrapping, the accuracy does improved a little, which aligns our expectation.
-
-
-
