@@ -49,3 +49,5 @@ Using bootstrapping, you can simulate this process:
 1.  Bootstrapping assumes randomness in your data, and therefore the statistical uncertainty in your answer, arises from the process of sampling.
 
 2.  Bootstrapping is also a good approximation for *other* common forms of randomness, including experimental randomization, measurement error, and intrinsic variability of some natural process.
+
+In the following section we will demonstrate how to implement bootstrapping in R.
