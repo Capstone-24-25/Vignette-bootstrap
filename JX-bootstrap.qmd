@@ -1,0 +1,11 @@
+---
+title: "JX-Bootstrap"
+format: html
+editor: visual
+---
+
+## Intro to Bootstrapping
+
+**hhh**
+
+# numve
