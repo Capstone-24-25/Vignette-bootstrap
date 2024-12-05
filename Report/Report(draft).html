@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Jiaxin Su, Sumeng Xu, Ziqian Zhao">
-<meta name="dcterms.date" content="2024-12-03">
+<meta name="dcterms.date" content="2024-12-05">
 
 <title>Vignette on bootstrapping and its application in predicting obesity levels; created as a class project for PSTAT197A in Fall 2024.</title>
 <style>
@@ -24,7 +24,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -69,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="Report(draft)_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Report(draft)_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Report(draft)_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
 <script src="Report(draft)_files/libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="Report(draft)_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
@@ -100,7 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading"></div>
     <div class="quarto-title-meta-contents">
-      <p class="date">December 3, 2024</p>
+      <p class="date">December 5, 2024</p>
     </div>
   </div>
   
@@ -108,20 +109,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
-
 </header>
-
 
 <section id="basic-bootstrapping" class="level2">
 <h2 class="anchored" data-anchor-id="basic-bootstrapping">Basic Bootstrapping</h2>
 <p><strong>Bootstrap resampling/Bootstrapping</strong> is the process, pretending that our sample represents some notional population, and taking repeated samples of size N with replacement from our original sample of size N.</p>
-<p>We use bootstrapping when we can’t feasibly take repeated samples from the same random process that generated our data, to see how our estimate changes from one sample to the next. The inability to resample is often due to factors such as the time-consuming nature of the process, the high cost of collecting additional data, and other practical constraints.</p>
+<p>We use bootstrapping when we can’t take repeated samples from the same random process that generated our data, to see how our estimate changes from one sample to the next. The inability to resample is often due to factors such as the time-consuming nature of the process, the high cost of collecting additional data, and other practical constraints.</p>
 </section>
 <section id="process" class="level1">
 <h1>Process</h1>
 <ol type="1">
 <li><p>Sampling N individuals from the population.</p></li>
-<li><p>Obtain a sample of size N from the original dataset with replacement. This new sample is referred as the bootstrapped dataset.</p></li>
+<li><p>Obtaining a sample of size N from the original dataset with replacement. This new sample is referred as the bootstrapped dataset.</p></li>
 <li><p>Calculating some types of statistical metrics, like mean</p></li>
 <li><p>Keeping track of the metrics for each bootstrap sample.</p></li>
 <li><p>Repeating steps 2 to 4 a bunch of times</p>
@@ -146,23 +145,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Assumption</h1>
 <ol type="1">
 <li><p>Bootstrapping assumes randomness in your data, and therefore the statistical uncertainty in your answer, arises from the process of sampling.</p></li>
-<li><p>Bootstrapping is also a good approximation for <em>other</em> common forms of randomness, including experimental randomization, measurement error, and intrinsic variability of some natural process.</p></li>
+<li><p>Bootstrapping is also a good approximation for other common forms of randomness as well, including experimental randomization, measurement error, and intrinsic variability of some natural process.</p></li>
 </ol>
 <p>In the following section we will demonstrate how to implement bootstrapping in R.</p>
 </section>
-<section id="application" class="level1">
-<h1>Application</h1>
-<p>After we have an idea about what bootstrap is, let’s go over a simple example to see its application in a classification prediction task and its impact.</p>
-<p>The dataset is from Kaggle <em>https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels</em>, which is first introduced in the paper <em>Yağın, Fatma Hilal et al.&nbsp;“Estimation of Obesity Levels with a Trained Neural Network Approach optimized by the Bayesian Technique.” Applied Sciences (2023): n.&nbsp;pag.</em> to estimate obesity levels with neural network. The original data contains 17 attributes and 2111 observations. For our purpose in performing bootstrapping, we are going to randomly sample a smaller subset of the data set (700 observations) and perform a <strong>decision tree</strong> to do classification.</p>
-<p>In this example, we aim to do two decision trees with original data set and bootstrapped data set, and investigate the changes in accuracy and the impact on prediction.</p>
+<section id="basic-bootstrapping-1" class="level1">
+<h1>Basic Bootstrapping</h1>
+<p>First, let’s learn how to create bootstrap samples by randomly resampling the original data with replacement, enabling us to estimate variability in sample statistics such as the mean or standard error. We’ll use the <strong>Obesity_sample</strong> dataset as an example to demonstrate this process.</p>
+<p>The dataset is from Kaggle <em>https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels</em>, which is first introduced in the paper <em>Yağın, Fatma Hilal et al.&nbsp;“Estimation of Obesity Levels with a Trained Neural Network Approach optimized by the Bayesian Technique.” Applied Sciences (2023): n.&nbsp;pag.</em> to estimate obesity levels with neural network. The original data contains 17 attributes and 2111 observations. For our purpose in performing bootstrapping, we are going to randomly sample a smaller subset of the data set (700 observations) and perform a <strong>decision tree</strong> to do classification (in the later section).</p>
 </section>
 <section id="load-library-and-clean-dataset" class="level1">
 <h1>Load library and clean dataset</h1>
-<p>Firstly, let’s look at the dataset</p>
-<div class="cell">
+<p>Let’s look at the dataset</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-2_abe5e3a40cfda0c109be3080a23fd35c">
 <div class="cell-output-display">
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; ">
-<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Age</th>
@@ -286,32 +284,172 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </div>
 </div>
+<section id="explore-the-sample-mean-of-weight-in-data-set" class="level2">
+<h2 class="anchored" data-anchor-id="explore-the-sample-mean-of-weight-in-data-set">Explore the sample mean of weight in data set</h2>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-3_423ca30b196aafdc2f5c0f9e479e9e7a">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sample_weight <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(Obesity_sample) <span class="sc">+</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> Weight), <span class="at">binwidth=</span><span class="dv">5</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sample_weight</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The histogram above displays the distribution of weights, with most data points concentrated between 40 and 100. It peaks around the 70-80 range, which is the most frequent weight in the data set.</p>
+<p>To get a more precise data, we can use the following mean function to calculate the mean of sample weight.</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-4_5d55c07ce2f60d6907de896647330d10">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sample_weightm<span class="ot">&lt;-</span><span class="fu">mean</span>(<span class="sc">~</span>Weight, <span class="at">data=</span>Obesity_sample) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sample_weightm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 85.94483</code></pre>
+</div>
+</div>
+<p>On average, the weight is around 85.94. However, since these samples are based on 700 observations, there is still variability when applying this result to the entire population in those countries.</p>
+</section>
+<section id="bootstrapping" class="level2">
+<h2 class="anchored" data-anchor-id="bootstrapping">Bootstrapping</h2>
+<p>Now, let’s practice doing <strong>a single bootstrap</strong></p>
+<p>The first line of code creates a bootstrap sample from the original data (Obesity_sample) using the resample function from the mosaic package. As mentioned earlier, a bootstrap sample is generated by randomly selecting observations with replacement, meaning some rows may appear multiple times while others may not appear at all. This simulates taking a new sample from the same population.</p>
+<p>The second line of code calculates the mean weight from the bootstrap sample.</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-5_bb4596134c072f7844880f5a8b46505e">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1970</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_weight_bootstrap <span class="ot">=</span> mosaic<span class="sc">::</span><span class="fu">resample</span>(Obesity_sample)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="sc">~</span>Weight, <span class="at">data=</span>sample_weight_bootstrap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 86.79762</code></pre>
+</div>
+</div>
+<p>The result is around 87, slightly higher than the sample mean. This difference represents a bootstrap sampling error, which occurs because the bootstrap sample may not perfectly represent the original data. However, a single bootstrap iteration provides only one estimate, which is not enough to understand the overall variability of the bootstrap process. To get a more comprehensive view, we need to perform multiple bootstrap iterations.</p>
+<p>Let’s proceed to conduct <strong>1,000 bootstrap</strong> samples to better capture the distribution and variability of the bootstrap means.</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-6_13a70b6782b8122fc05e7094769e4cad">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating 10,000 bootstrap samples from Obesity_sample</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Then calculates the mean for each bootstrap sample</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1970</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>boot_weight <span class="ot">=</span> <span class="fu">do</span>(<span class="dv">10000</span>)<span class="sc">*</span><span class="fu">mean</span>(<span class="sc">~</span>Weight, <span class="at">data=</span>mosaic<span class="sc">::</span><span class="fu">resample</span>(Obesity_sample))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(boot_weight) <span class="sc">+</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x=</span>mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This histogram shows the distribution of the means from 10,000 bootstrap samples. The graph is approximately symmetric and bell-shaped, centered around the original sample mean, which was close to 86.</p>
+<p>Comparing this to the graph of the original sample mean, the bootstrap distribution helps us understand the uncertainty in the sample mean as an estimate of the population mean. The narrow spread in the bootstrap distribution suggests that the sample mean is a fairly precise estimate, as most bootstrap means are clustered close to the original sample mean.</p>
+</section>
+<section id="standard-errors" class="level2">
+<h2 class="anchored" data-anchor-id="standard-errors">Standard Errors</h2>
+<section id="bootstrapping-vs.-the-original-sample" class="level4">
+<h4 class="anchored" data-anchor-id="bootstrapping-vs.-the-original-sample">Bootstrapping VS. the Original Sample</h4>
+<p>First, let’s calculate the original sample’s standard error:</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-7_ff4a2777880bf139a6db043e219aa83d">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(Obesity_sample)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>std_err_weight <span class="ot">&lt;-</span> <span class="fu">sd</span>(<span class="sc">~</span>Weight, <span class="at">data =</span> Obesity_sample) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>std_err_weight</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.006241</code></pre>
+</div>
+</div>
+<p>Then calculate the Bootstrap standard Error:</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-8_bf2bfdbf68c96e89353f8ffd3b2e19ca">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>boot_std_error <span class="ot">&lt;-</span> boot_weight <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">std_err_weight =</span> <span class="fu">sd</span>(mean)) </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>boot_std_error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  std_err_weight
+1      0.9852292</code></pre>
+</div>
+</div>
+<p>Although the two values are close (1.006 and 0.99), demonstrating consistency in the standard error estimate, there exists a difference of approximately 0.016, with the bootstrap standard error being slightly lower. This small discrepancy arises because the bootstrap method captures variability through resampling, which inherently smooths out extreme values by averaging across multiple simulated samples.</p>
+<p>In contrast, the original sample standard error is derived solely from the observed dataset, assuming it is representative of the population and relying directly on the sample’s fixed variability. The lower bootstrap standard error suggests that the resampling approach estimates slightly less variability in the data compared to the original method, potentially reflecting a more refined measure of uncertainty.</p>
+</section>
+</section>
+<section id="action-1" class="level2">
+<h2 class="anchored" data-anchor-id="action-1">Action 1</h2>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-9_26b4db333839e1cc17163ac761e03e22">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">confint</span>(boot_weight, <span class="at">level =</span> <span class="fl">0.95</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  name    lower   upper level     method estimate
+1 mean 84.04354 87.8565  0.95 percentile 86.77514</code></pre>
+</div>
+</div>
+<p>Above is the 95% confidence interval for the average weight.</p>
+<p><strong>True or false</strong>: The histogram of the 1,000 Bootstrap, and the associated confidence interval, tell us that about 95% of all individuals weight between 84.04 and 87.86?</p>
+<p>(answer: False: The histogram of the 1,000 Bootstrap and the associated confidence interval tell us that about 95% of the sample means (not individual weights) fall between 84.04 and 87.86. The confidence interval reflects the range within which we expect the true population mean to lie, based on the bootstrap sampling distribution of the mean, not the range of individual weights in the population.)</p>
+</section>
+<section id="action-2" class="level2">
+<h2 class="anchored" data-anchor-id="action-2">Action 2</h2>
+<p>Now, try to do the same bootstrapping process for weight based on Gender</p>
+<hr>
+<p>(answer below )</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-10_0b455ad53f0940482f9065d28a422d87">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(Weight <span class="sc">~</span> Gender, <span class="at">data=</span>Obesity_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Female     Male 
+81.92943 89.75890 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diffmean</span>(Weight <span class="sc">~</span> Gender, <span class="at">data=</span>Obesity_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>diffmean 
+7.829461 </code></pre>
+</div>
+</div>
+<p>The difference in mean tells us that male weight 7.8 more than female.</p>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-11_50cb3b337f58132d4f4a835ab3790546">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1970</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># bootstrap </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>boot_weight_gender <span class="ot">=</span> <span class="fu">do</span>(<span class="dv">10000</span>)<span class="sc">*</span><span class="fu">diffmean</span>(Weight <span class="sc">~</span> Gender, <span class="at">data=</span>mosaic<span class="sc">::</span><span class="fu">resample</span>(Obesity_sample))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#visual </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(boot_weight_gender) <span class="sc">+</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x=</span>diffmean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% confidence interval</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(boot_weight_gender, <span class="at">level =</span> <span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      name    lower    upper level     method estimate
+1 diffmean 3.703572 11.68759  0.95 percentile 5.813157</code></pre>
+</div>
+</div>
+<p>The bootstrap analysis estimates a difference in means of approximately 5.81, with a 95% confidence interval ranging from 3.7 to 11.69. The bootstrap estimate of 5.81 is slightly lower than the original observed difference of 7.83. This discrepancy reflects the inherent variability captured by the bootstrap method, which averages across multiple resampled datasets.</p>
+<p>Additionally, the original difference of 7.83 lies well within the 95% confidence interval [3.70, 11.69], indicating that the observed difference is consistent with what could be expected under random sampling variability.</p>
+</section>
+<section id="basic-bootstrapping-conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="basic-bootstrapping-conclusion">Basic Bootstrapping Conclusion:</h2>
+<p>Now, hope you already learned the basic of doing bootstrap! So far, we explored the concept and application of bootstrapping, a resampling method used to estimate the variability and confidence intervals of sample statistics.</p>
+<hr>
+</section>
+</section>
+<section id="application" class="level1">
+<h1>Application</h1>
+<p>After we have an idea about what bootstrap is, let’s go over a simple example to see its application in a classification prediction task and its impact.</p>
+<p>In this example, we aim to do two decision trees with original data set and bootstrapped data set, and investigate the changes in accuracy and the impact on prediction.</p>
 </section>
 <section id="decision-tree-without-bootstrapping" class="level1">
 <h1>Decision Tree Without Bootstrapping</h1>
 <section id="partition-training-and-testing" class="level2">
 <h2 class="anchored" data-anchor-id="partition-training-and-testing">Partition training and testing</h2>
 <p>We parition the data into 80% training and 20% testing stratified by the response <code>NObeyesdad</code>. We’ll also use 5 folds to perform stratifies cross validation.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>partitions <span class="ot">&lt;-</span> Obesity_sample <span class="sc">%&gt;%</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>(<span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> NObeyesdad)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Obesity_train <span class="ot">&lt;-</span> <span class="fu">training</span>(partitions)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Obesity_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(partitions)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Obesity_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(Obesity_train , <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> NObeyesdad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-12_d060d84aa37a45c3240a9f731273d901">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>partitions <span class="ot">&lt;-</span> Obesity_sample <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>(<span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> NObeyesdad)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>Obesity_train <span class="ot">&lt;-</span> <span class="fu">training</span>(partitions)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>Obesity_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(partitions)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>Obesity_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(Obesity_train , <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> NObeyesdad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="data-visualization" class="level2">
 <h2 class="anchored" data-anchor-id="data-visualization">Data Visualization</h2>
 <p>Firstly, we see the distribution of our response variable in training data set:</p>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-13_5f07445cf7764b44597bc984dd051c0d">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Obesity Status without Bootstrap</figcaption>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Obesity Status without Bootstrap</figcaption>
 </figure>
 </div>
 </div>
@@ -320,72 +458,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="recipe" class="level2">
 <h2 class="anchored" data-anchor-id="recipe">Recipe</h2>
 <p>We are going to use all predictors to predict obesity status <code>NObeyesdad</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Recipe using all variables</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> Obesity_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-14_8851eca35300584ed2cc95d0ffa63589">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Recipe using all variables</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> Obesity_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="creating-decision-tree-model" class="level2">
 <h2 class="anchored" data-anchor-id="creating-decision-tree-model">Creating Decision Tree Model</h2>
 <p>We create a decision tree tuning the hyperparameter <code>cost_complexity</code></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tuning cost_complexity</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Obesity_tree <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Decision Tree Workflow</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>Obesity_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>param_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost_complexity</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">4.5</span>, <span class="sc">-</span><span class="dv">2</span>)), <span class="at">levels =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-15_bfd940c65bf8125bce117e8a0c8bc6ea">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tuning cost_complexity</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>Obesity_tree <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Decision Tree Workflow</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>Obesity_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>param_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost_complexity</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">4.5</span>, <span class="sc">-</span><span class="dv">2</span>)), <span class="at">levels =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune the model</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> Obesity_folds,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> param_grid,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-16_108da29d72ad80870d296a072030b888">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune the model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> Obesity_folds,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> param_grid,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-result-of-original-data" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-result-of-original-data">Visualize Result of Original data</h2>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-17_94443cb247badb1312ab4984cd74af3a">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 </section>
 <section id="decision-tree-with-bootstrapping" class="level1">
 <h1>Decision Tree with bootstrapping</h1>
-<section id="bootstrapping" class="level2">
-<h2 class="anchored" data-anchor-id="bootstrapping">Bootstrapping</h2>
+<section id="bootstrapping-1" class="level2">
+<h2 class="anchored" data-anchor-id="bootstrapping-1">Bootstrapping</h2>
 <p>We bootstrap the training set for 1000 times.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2345</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> <span class="fu">resample</span>(Obesity_train,<span class="at">times =</span> <span class="dv">1000</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> boot_Obesity <span class="sc">%&gt;%</span> </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>orig.id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-19_0bdb5741e8776ecc7380bf6190e78b63">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2345</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> <span class="fu">resample</span>(Obesity_train,<span class="at">times =</span> <span class="dv">1000</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> boot_Obesity <span class="sc">%&gt;%</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>orig.id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-response-variable" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-response-variable">Visualize Response Variable</h2>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-20_a60a9aaae94749366f43dad665a13fb6">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Obesity Status with Bootstrap</figcaption>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Obesity Status with Bootstrap</figcaption>
 </figure>
 </div>
 </div>
@@ -394,12 +528,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="compare-with-before-bootstrapping" class="level2">
 <h2 class="anchored" data-anchor-id="compare-with-before-bootstrapping">Compare with before bootstrapping</h2>
 <p>Here we visualize the distribution of our response variables from two training set.</p>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-21_0d5dde31fe851d879d2745fb413dca74">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Comparison of Obesity Status across training set</figcaption>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Comparison of Obesity Status across training set</figcaption>
 </figure>
 </div>
 </div>
@@ -408,39 +542,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="new-recipe-and-model" class="level2">
 <h2 class="anchored" data-anchor-id="new-recipe-and-model">New Recipe and Model</h2>
 <p>We use the same recipe with data changed to bootstrapped data. Perform the exact same procedure as before to see the impact of bootstrapping.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recipe</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe_bt <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> boot_Obesity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-22_96aeef63754af6fa1e68d83b221914b6">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recipe</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe_bt <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> boot_Obesity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrokflow</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Obesity_workflow_bt <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe_bt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-23_75b06789efe4fadf4e22a3ecd857de51">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrokflow</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>Obesity_workflow_bt <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe_bt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune model</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree_bt <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow_bt,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> Obesity_folds,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> param_grid,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree_bt, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree_bt.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-24_0efb288c424bc6ffc4440af45ceee4ab">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune model</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree_bt <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow_bt,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> Obesity_folds,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> param_grid,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree_bt, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree_bt.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-result-with-bootstrapped-data" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-result-with-bootstrapped-data">Visualize Result with Bootstrapped data</h2>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-25_20c70dec3cc8306151050c025001bc07">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</div>
-<table class="caption-top table">
+<table class="table">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -469,42 +599,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We then fit our model with the best <strong>cost_complexity</strong> and predict on our test set.</p>
 <section id="prediction-with-two-models" class="level2">
 <h2 class="anchored" data-anchor-id="prediction-with-two-models">Prediction with two models</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>best_complexity <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_model <span class="ot">&lt;-</span> <span class="fu">fit</span>(Ori_Obesity_tree_final, <span class="at">data =</span> Obesity_train)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_model_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(Ori_Obesity_model, </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                               Obesity_test) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NObeyesdad, <span class="fu">starts_with</span>(<span class="st">".pred"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-28_2a344736a52772b0146092d1d598900a">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>best_complexity <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_model <span class="ot">&lt;-</span> <span class="fu">fit</span>(Ori_Obesity_tree_final, <span class="at">data =</span> Obesity_train)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>Ori_Obesity_model_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(Ori_Obesity_model, </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                               Obesity_test) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NObeyesdad, <span class="fu">starts_with</span>(<span class="st">".pred"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>best_complexity_bt <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree_bt)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bt_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity_bt)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>bt_Obesity_model <span class="ot">&lt;-</span> <span class="fu">fit</span>(bt_Obesity_tree_final, <span class="at">data =</span> boot_Obesity)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>bt_Obesity_model_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(bt_Obesity_model, </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                               Obesity_test) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NObeyesdad, <span class="fu">starts_with</span>(<span class="st">".pred"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-29_b1956857c8c21f9e4d4525b4640ff0d9">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>best_complexity_bt <span class="ot">&lt;-</span> <span class="fu">select_best</span>(Obesity_tune_tree_bt)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>bt_Obesity_tree_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(Obesity_workflow, best_complexity_bt)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>bt_Obesity_model <span class="ot">&lt;-</span> <span class="fu">fit</span>(bt_Obesity_tree_final, <span class="at">data =</span> boot_Obesity)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>bt_Obesity_model_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(bt_Obesity_model, </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                               Obesity_test) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NObeyesdad, <span class="fu">starts_with</span>(<span class="st">".pred"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-the-roc-curve-for-both-prediction-model" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-the-roc-curve-for-both-prediction-model">Visualize the ROC curve for both prediction model</h2>
-<div class="cell">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-30_fda6d24edb4ce3e4c46d46852f915385">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Report-draft-_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="Report-draft-_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>From the <strong>roc curve</strong>, we could see that models trained by bootstrapped data hugs the top-left corner more than the model without bootstrapping.</p>
-<table class="caption-top table">
+<table class="table">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -563,7 +689,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const onCopySuccess = function(e) {
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -595,50 +732,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
   });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -648,17 +746,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -670,130 +759,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
-        }
-        return container.innerHTML
-      } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
+      return note.innerHTML;
     });
   }
       let selectedAnnoteEl;
@@ -837,7 +803,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -863,32 +828,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -949,7 +888,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-
 
 
 
