@@ -479,7 +479,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>param_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost_complexity</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">4.5</span>, <span class="sc">-</span><span class="dv">2</span>)), <span class="at">levels =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-16_108da29d72ad80870d296a072030b888">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-16_d728c393b2deec14746341131aa15a74">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune the model</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow,</span>
@@ -488,7 +488,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># save(Obesity_tune_tree, file = "../results/Obesity_tune_tree.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-result-of-original-data" class="level2">
@@ -505,9 +505,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="bootstrapping-1" class="level2">
 <h2 class="anchored" data-anchor-id="bootstrapping-1">Bootstrapping</h2>
 <p>We bootstrap the training set for 1000 times.</p>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-19_0bdb5741e8776ecc7380bf6190e78b63">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-19_d81250eaa03da32c6e1c45dda51afe45">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2345</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> <span class="fu">resample</span>(Obesity_train,<span class="at">times =</span> <span class="dv">1000</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> mosaic<span class="sc">::</span><span class="fu">resample</span>(Obesity_train,<span class="at">times =</span> <span class="dv">1000</span>,<span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>boot_Obesity <span class="ot">&lt;-</span> boot_Obesity <span class="sc">%&gt;%</span> </span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>orig.id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -546,13 +546,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recipe</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>Obesity_recipe_bt <span class="ot">&lt;-</span><span class="fu">recipe</span>(NObeyesdad <span class="sc">~</span> ., <span class="at">data =</span> boot_Obesity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-23_75b06789efe4fadf4e22a3ecd857de51">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrokflow</span></span>
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-23_abbd2daf2ed144649f083f3d79c19abe">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Workflow</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>Obesity_workflow_bt <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(Obesity_tree) <span class="sc">%&gt;%</span> </span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(Obesity_recipe_bt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-24_0efb288c424bc6ffc4440af45ceee4ab">
+<div class="cell" data-hash="Report-draft-_cache/html/unnamed-chunk-24_e9b5a28b19a812869d8e6f506a465c04">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune model</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>Obesity_tune_tree_bt <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  Obesity_workflow_bt,</span>
@@ -560,7 +560,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> param_grid,</span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(Obesity_tune_tree_bt, <span class="at">file =</span> <span class="st">"../results/Obesity_tune_tree_bt.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co"># save(Obesity_tune_tree_bt, file = "../results/Obesity_tune_tree_bt.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualize-result-with-bootstrapped-data" class="level2">

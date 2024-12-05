@@ -478,4 +478,3 @@ confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obe
 | With Bootstrap    | 0.859    |
 
 Here, we can see that after bootstrapping, the accuracy does improved a little, which aligns our expectation.
-
