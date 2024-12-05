@@ -31,7 +31,7 @@ We use bootstrapping when we can’t take repeated samples from the same random 
 
 5.  Repeating steps 2 to 4 a bunch of times
 
-    [!!!]{style="color:red;"}Make sure to keep each bootstrap sample must be of the same size (N) as the original sample.
+    [!!!]{style="color:red;"} Make sure to keep each bootstrap sample must be of the same size (N) as the original sample.
 
     [!!!]{style="color:red;"} Remember to have each bootstrap sample with replacement from the original sample.
 
