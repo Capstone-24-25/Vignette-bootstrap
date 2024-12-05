@@ -213,7 +213,7 @@ The bootstrap analysis estimates a difference in means of approximately 5.81, wi
 
 Additionally, the original difference of 7.83 lies well within the 95% confidence interval \[3.70, 11.69\], indicating that the observed difference is consistent with what could be expected under random sampling variability.
 
-## Basic Bootstrapping Conclusion: 
+## Basic Bootstrapping Conclusion:
 
 Now, hope you already learned the basic of doing bootstrap! So far, we explored the concept and application of bootstrapping, a resampling method used to estimate the variability and confidence intervals of sample statistics.
 
@@ -291,7 +291,7 @@ Obesity_tune_tree <- tune_grid(
   metrics = metric_set(roc_auc)
 )
 
-save(Obesity_tune_tree, file = "../results/Obesity_tune_tree.RData")
+# save(Obesity_tune_tree, file = "../results/Obesity_tune_tree.RData")
 ```
 
 ## Visualize Result of Original data
@@ -315,7 +315,7 @@ We bootstrap the training set for 1000 times.
 
 ```{r}
 set.seed(2345)
-boot_Obesity <- resample(Obesity_train,times = 1000)
+boot_Obesity <- mosaic::resample(Obesity_train,times = 1000,replace = TRUE)
 boot_Obesity <- boot_Obesity %>% 
   select(-orig.id)
 ```
@@ -367,7 +367,7 @@ Obesity_recipe_bt <-recipe(NObeyesdad ~ ., data = boot_Obesity)
 ```
 
 ```{r}
-# Wrokflow
+# Workflow
 Obesity_workflow_bt <- workflow() %>% 
   add_model(Obesity_tree) %>% 
   add_recipe(Obesity_recipe_bt)
@@ -381,7 +381,7 @@ Obesity_tune_tree_bt <- tune_grid(
   grid = param_grid,
   metrics = metric_set(roc_auc)
 )
-save(Obesity_tune_tree_bt, file = "../results/Obesity_tune_tree_bt.RData")
+# save(Obesity_tune_tree_bt, file = "../results/Obesity_tune_tree_bt.RData")
 ```
 
 ## Visualize Result with Bootstrapped data
@@ -478,3 +478,4 @@ confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obe
 | With Bootstrap    | 0.859    |
 
 Here, we can see that after bootstrapping, the accuracy does improved a little, which aligns our expectation.
+

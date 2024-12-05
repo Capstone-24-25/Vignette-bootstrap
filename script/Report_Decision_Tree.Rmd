@@ -129,7 +129,7 @@ We bootstrap the training set for 1000 times.
 
 ```{r}
 set.seed(2345)
-boot_Obesity <- resample(Obesity_train,times = 1000)
+boot_Obesity <- mosaic::resample(Obesity_train,times = 1000,replace = TRUE)
 boot_Obesity <- boot_Obesity %>% 
   select(-orig.id)
 ```
