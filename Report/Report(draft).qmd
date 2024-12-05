@@ -23,7 +23,7 @@ We use bootstrapping when we can’t take repeated samples from the same random 
 
 1.  Sampling N individuals from the population.
 
-2.  Obtaining a sample of size N from the original dataset with replacement. This new sample is referred as the bootstrapped dataset.
+2.  Create a bootstrapped dataset by sampling N observations with replacement from the original sample
 
 3.  Calculating some types of statistical metrics, like mean
 
