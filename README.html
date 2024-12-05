@@ -366,22 +366,50 @@ the resampling method – bootstrapping– in the following aspects:</p>
 <li><p>how the bootstrap usually, but not always, works well.</p></li>
 </ul>
 <p>Further, we will develop a model with bootstrap step by step to build
-better intuition on this method. Our data is from: <em>url</em> and we
-aim to <em>Goal</em></p>
+better intuition on this method. Our data is from: <a href="https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels" class="uri"><em>https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels</em></a>
+and we aim to <em>predict obesity levels</em></p>
 </div>
 <div id="repository-contents" class="section level2">
 <h2>Repository contents:</h2>
 <ul>
-<li><p><code>data</code> contains</p></li>
-<li><p><code>scripts</code> contains</p></li>
-<li><p><code>results</code> contains</p></li>
+<li><p><code>data</code> contains the original raw obesity data and a
+random sample, which is a smaller subset of the dataset with 700
+observations.</p></li>
+<li><p><code>scripts</code> contains</p>
+<ul>
+<li><p><code>Jiaxin_intro.qmd</code> provides an introduction to the
+basics of bootstrapping and explains its main concepts. It explains the
+key concepts of bootstrapping, including how it works, its purpose, and
+its applications.</p></li>
+<li><p><code>basic_bootstrap.Rmd</code> explores the method for basic
+bootstrap, providing a step-by-step exploration of this statistical
+technique. It compares the mean of the original sample to that of single
+and 1,000 bootstrap samples, and examines the standard error derived
+from the original sample versus the standard error estimated from 1,000
+bootstrap samples, highlighting the variability captured through
+resampling. There are two action items for you to practice.</p></li>
+<li><p><code>Report_decision_tree.Rmd</code> presents the application of
+bootstrapping using decision trees, focusing on performance in
+classification prediction tasks and its impact.</p></li>
+</ul></li>
+<li><p><code>results</code> contains the result in tuned decision tree
+created using bootstrapping.</p></li>
 </ul>
 </div>
 <div id="step-by-step-instruction" class="section level2">
 <h2>Step-by step instruction</h2>
+<p>Using the report file, you can follow along to understand the concept
+of bootstrapping and its application. The two action items provide an
+opportunity for you to practice performing bootstrapping on your
+own!</p>
 </div>
 <div id="reference-list" class="section level2">
 <h2>Reference list:</h2>
+<p><a href="https://stats.oarc.ucla.edu/r/library/r-library-introduction-to-bootstrapping/">UCLA
+Intro to Bootstrapping</a></p>
+<p><a href="https://bookdown.org/jgscott/DSGI/the-bootstrap.html" class="uri">https://bookdown.org/jgscott/DSGI/the-bootstrap.html</a></p>
+<p>Continue reading: <a href="https://www.tandfonline.com/doi/epdf/10.1080/07474939608800344?needAccess=true">Bootstrapping
+in Time Series Models</a></p>
 </div>
 </div>
 
