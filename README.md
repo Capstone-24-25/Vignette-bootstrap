@@ -6,9 +6,9 @@ Contributors: Jiaxin Su, Sumeng Xu, Ziqian Zhao
 
 This is the template repository for Vignette project for Group 7 focusing on **bootstrapping**. We are going to introduce the resampling method -- bootstrapping-- in the following aspects:
 
--   the bootstrap sampling distribution,
+-   the bootstrap sampling distribution.
 
--   bootstrap standard errors and confidence intervals,
+-   bootstrap standard errors and confidence intervals.
 
 -   how the bootstrap usually, but not always, works well.
 
@@ -16,7 +16,7 @@ Further, we will develop a model with bootstrap step by step to build better int
 
 ## Repository contents:
 
--   `data` contains the original raw obesity data and a random sample, which is a smaller subset of the dataset with 700 observations.
+-   `data` contains the original raw obesity data and a random sample, which is a smaller subset of the data set with 700 observations.
 
 -   `scripts` contains
 
@@ -27,6 +27,10 @@ Further, we will develop a model with bootstrap step by step to build better int
     -   `Report_decision_tree.Rmd` presents the application of bootstrapping using decision trees, focusing on performance in classification prediction tasks and its impact.
 
 -   `results` contains the result in tuned decision tree created using bootstrapping.
+
+-   `Report` contains the written report with a step-by-step explanation of bootstrapping, including all files generated from `Jiaxin_intro.qmd`, `basic_bootstrap.Rmd`, and `Report_decision_tree.Rmd`.
+
+-   `images` contain all the images in our files.
 
 ## Step-by step instruction
 
