@@ -12,7 +12,7 @@ This is the repository for Vignette project for Group 7 focusing on **bootstrapp
 
 -   how the bootstrap usually, but not always, works well.
 
-Further, we will develop a model with bootstrap step by step to build better intuition on this method. Our data is from: [*https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels*](https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels){.uri} and we aim to *predict obesity levels*
+Further, we will develop a model with bootstrap step by step to build better intuition on this method. Our data is from: [*https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels*](https://www.kaggle.com/datasets/fatemehmehrparvar/obesity-levels) and we aim to *predict obesity levels*
 
 ## Repository contents:
 
