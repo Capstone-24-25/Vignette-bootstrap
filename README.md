@@ -30,8 +30,6 @@ Further, we will develop a model with bootstrap step by step to build better int
 
 -   `Report` contains the written report with a step-by-step explanation of bootstrapping, including all files generated from `Jiaxin_intro.qmd`, `basic_bootstrap.Rmd`, and `Report_decision_tree.Rmd`.
 
--   `images` contain all the images in our files.
-
 ## Step-by step instruction
 
 Using the report file, you can follow along to understand the concept of bootstrapping and its application. The two action items provide an opportunity for you to practice performing bootstrapping on your own!
