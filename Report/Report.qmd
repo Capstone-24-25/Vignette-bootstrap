@@ -412,7 +412,7 @@ metric_comp <- data.frame(
 
 Here, as we expected the performance, the performance is similar. Actually, in our case, the metric for these two model is exactly the same, which possibly attribute to the very similar training set we have. Additionally, we are using a **decision tree** purely for learning purpose, which, a simple model, might be less sensitive to the change in data set.
 
-# Conclusion
+# Result
 
 We then fit our model with the best **cost_complexity** and predict on our test set.
 
@@ -478,3 +478,14 @@ confusion_matrix_bt <- confusionMatrix(bt_Obesity_model_test$.pred_class, bt_Obe
 | With Bootstrap    | 0.859    |
 
 Here, we can see that after bootstrapping, the accuracy does improved a little, which aligns our expectation.
+
+
+# Conclusion
+
+Bootstrapping is a powerful statistical tool with several advantages however, it also has some drawbacks such as computational expenses. Here are some pros and cons of bootstrapping:
+
+| Pros             | Cons |
+|-------------------|-------------------|
+| No assumptions about the underlying population distribution | Computational intensive by requiring large of resamples  |
+| Interpretable by its relatively simple computation method  | Sensitive to outliers    |
+
