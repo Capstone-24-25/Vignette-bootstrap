@@ -4,7 +4,7 @@ Contributors: Jiaxin Su, Sumeng Xu, Ziqian Zhao
 
 ## Vignette abstract:
 
-This is the template repository for Vignette project for Group 7 focusing on **bootstrapping**. We are going to introduce the resampling method -- bootstrapping-- in the following aspects:
+This is the repository for Vignette project for Group 7 focusing on **bootstrapping**. We are going to introduce the resampling method -- bootstrapping-- in the following aspects:
 
 -   the bootstrap sampling distribution.
 
@@ -16,7 +16,11 @@ Further, we will develop a model with bootstrap step by step to build better int
 
 ## Repository contents:
 
--   `data` contains the original raw obesity data and a random sample, which is a smaller subset of the data set with 700 observations.
+-   `data` contains
+
+    -   `Obesity_Raw.csv` is the original obesity dataset sourced from Kaggle, containing 2,111 observations and 17 variables. This dataset contains information used to estimate obesity levels in individuals from Mexico, Peru, and Colombia, based on their eating habits and physical conditions.
+    -   `Obesity_sample.csv` is the dataset conting a smaller subset of the data set with 700 observations, through random sampling.
+    -   `Clean_Data.R` is responsible for data preprocessing, ensuring that variables are transformed into their appropriate types for analysis.
 
 -   `scripts` contains
 
@@ -32,7 +36,7 @@ Further, we will develop a model with bootstrap step by step to build better int
 
 ## Step-by step instruction
 
-Using the report file, you can follow along to understand the concept of bootstrapping and its application. The two action items provide an opportunity for you to practice performing bootstrapping on your own!
+Using the provided report file, you can follow a clear and structured guide to grasp the concept of bootstrapping and its practical applications. Each section is designed to build your understanding gradually, from the fundamentals of bootstrapping to advanced applications. The two action items provide an opportunity for you to practice performing bootstrapping on your own! By the end, you’ll feel confident in both understanding and implementing this powerful statistical method.
 
 ## Reference list:
 

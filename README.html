@@ -357,12 +357,12 @@ display: none;
 <p>Contributors: Jiaxin Su, Sumeng Xu, Ziqian Zhao</p>
 <div id="vignette-abstract" class="section level2">
 <h2>Vignette abstract:</h2>
-<p>This is the template repository for Vignette project for Group 7
-focusing on <strong>bootstrapping</strong>. We are going to introduce
-the resampling method – bootstrapping– in the following aspects:</p>
+<p>This is the repository for Vignette project for Group 7 focusing on
+<strong>bootstrapping</strong>. We are going to introduce the resampling
+method – bootstrapping– in the following aspects:</p>
 <ul>
-<li><p>the bootstrap sampling distribution,</p></li>
-<li><p>bootstrap standard errors and confidence intervals,</p></li>
+<li><p>the bootstrap sampling distribution.</p></li>
+<li><p>bootstrap standard errors and confidence intervals.</p></li>
 <li><p>how the bootstrap usually, but not always, works well.</p></li>
 </ul>
 <p>Further, we will develop a model with bootstrap step by step to build
@@ -372,9 +372,20 @@ and we aim to <em>predict obesity levels</em></p>
 <div id="repository-contents" class="section level2">
 <h2>Repository contents:</h2>
 <ul>
-<li><p><code>data</code> contains the original raw obesity data and a
-random sample, which is a smaller subset of the dataset with 700
-observations.</p></li>
+<li><p><code>data</code> contains</p>
+<ul>
+<li><code>Obesity_Raw.csv</code> is the original obesity dataset sourced
+from Kaggle, containing 2,111 observations and 17 variables. This
+dataset contains information used to estimate obesity levels in
+individuals from Mexico, Peru, and Colombia, based on their eating
+habits and physical conditions.</li>
+<li><code>Obesity_sample.csv</code> is the dataset conting a smaller
+subset of the data set with 700 observations, through random
+sampling.</li>
+<li><code>Clean_Data.R</code> is responsible for data preprocessing,
+ensuring that variables are transformed into their appropriate types for
+analysis.</li>
+</ul></li>
 <li><p><code>scripts</code> contains</p>
 <ul>
 <li><p><code>Jiaxin_intro.qmd</code> provides an introduction to the
@@ -394,14 +405,22 @@ classification prediction tasks and its impact.</p></li>
 </ul></li>
 <li><p><code>results</code> contains the result in tuned decision tree
 created using bootstrapping.</p></li>
+<li><p><code>Report</code> contains the written report with a
+step-by-step explanation of bootstrapping, including all files generated
+from <code>Jiaxin_intro.qmd</code>, <code>basic_bootstrap.Rmd</code>,
+and <code>Report_decision_tree.Rmd</code>.</p></li>
 </ul>
 </div>
 <div id="step-by-step-instruction" class="section level2">
 <h2>Step-by step instruction</h2>
-<p>Using the report file, you can follow along to understand the concept
-of bootstrapping and its application. The two action items provide an
-opportunity for you to practice performing bootstrapping on your
-own!</p>
+<p>Using the provided report file, you can follow a clear and structured
+guide to grasp the concept of bootstrapping and its practical
+applications. Each section is designed to build your understanding
+gradually, from the fundamentals of bootstrapping to advanced
+applications. The two action items provide an opportunity for you to
+practice performing bootstrapping on your own! By the end, you’ll feel
+confident in both understanding and implementing this powerful
+statistical method.</p>
 </div>
 <div id="reference-list" class="section level2">
 <h2>Reference list:</h2>
