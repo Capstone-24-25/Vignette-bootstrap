@@ -44,4 +44,8 @@ Using the provided report file, you can follow a clear and structured guide to g
 
 <https://bookdown.org/jgscott/DSGI/the-bootstrap.html>
 
-Continue reading: [Bootstrapping in Time Series Models](https://www.tandfonline.com/doi/epdf/10.1080/07474939608800344?needAccess=true)
+Continue reading:
+
+-   [Bootstrapping in Time Series Models](https://www.tandfonline.com/doi/epdf/10.1080/07474939608800344?needAccess=true)
+
+-   [Bootstrap Methods in Econometrics](https://www.annualreviews.org/docserver/fulltext/economics/11/1/annurev-economics-080218-025651.pdf?expires=1734056110&id=id&accname=guest&checksum=C05BA407888BA5E20909CD06CB6FE2F0)
